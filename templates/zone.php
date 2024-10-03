@@ -26,6 +26,7 @@ $accounts = $this->get('accounts');
 $cryptokeys = $this->get('cryptokeys');
 $allusers = $this->get('allusers');
 $replication_types = $this->get('replication_types');
+$catalog_zones = $this->get('catalog_zones');
 $local_zone = $this->get('local_zone');
 $local_ipv4_ranges = $this->get('local_ipv4_ranges');
 $local_ipv6_ranges = $this->get('local_ipv6_ranges');
@@ -375,6 +376,21 @@ global $output_formatter;
 					</select>
 					<?php } else { ?>
 					<p class="form-control-static"><?php out($zone->kind)?></p>
+					<?php } ?>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="catalog" class="col-sm-2 control-label">Catalog zone</label>
+				<div class="col-sm-10">
+					<?php if($active_user->admin) { ?>
+					<select id="catalog" name="catalog" class="form-control">
+						<option value=""></option>
+						<?php foreach($catalog_zones as $zone) { ?>
+						<option value="<?php out($zone->name)?>"><?php out($zone->name)?></option>
+						<?php } ?>
+					</select>
+					<?php } else { ?>
+					<p class="form-control-static"><?php out($zone->catalog)?></p>
 					<?php } ?>
 				</div>
 			</div>

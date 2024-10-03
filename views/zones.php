@@ -23,6 +23,7 @@ usort($zones, function($a, $b) {
 });
 
 $replication_types = $replication_type_dir->list_replication_types();
+$catalog_zones = $zone_dir->list_zones_by_kind('Producer');
 $soa_templates = $template_dir->list_soa_templates();
 $ns_templates = $template_dir->list_ns_templates();
 $account_whitelist = !empty($config['dns']['classification_whitelist']) ? explode(',', $config['dns']['classification_whitelist']) : [];
@@ -40,6 +41,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$zone->account = trim($_POST['classification']);
 			$zone->dnssec = isset($_POST['dnssec']) ? 1 : 0;
 			$zone->kind = $_POST['kind'];
+			$zone->catalog = $_POST['catalog'];
 			$zone->nameservers = array();
 			foreach(preg_split('/[,\s]+/', $_POST['nameservers']) as $nameserver) {
 				$zone->nameservers[] = $nameserver;
@@ -68,6 +70,7 @@ if(!isset($content)) {
 	$content = new PageSection('zones');
 	$content->set('zones', $zones);
 	$content->set('replication_types', $replication_types);
+	$content->set('catalog_zones', $catalog_zones);
 	$content->set('soa_templates', $soa_templates);
 	$content->set('ns_templates', $ns_templates);
 	$content->set('dnssec_enabled', isset($config['dns']['dnssec']) ? $config['dns']['dnssec'] : '0');

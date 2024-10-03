@@ -93,6 +93,7 @@ $cryptokeys = $zone->get_cryptokeys();
 $accounts = $zone_dir->list_accounts();
 $allusers = $user_dir->list_users();
 $replication_types = $replication_type_dir->list_replication_types();
+$catalog_zones = $zone_dir->list_zones_by_kind('Producer');
 $force_change_review = isset($config['web']['force_change_review']) ? intval($config['web']['force_change_review']) : 0;
 $force_change_comment = isset($config['web']['force_change_comment']) ? intval($config['web']['force_change_comment']) : 0;
 $account_whitelist = !empty($config['dns']['classification_whitelist']) ? explode(',', $config['dns']['classification_whitelist']) : [];
@@ -215,6 +216,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 		redirect();
 	} elseif(isset($_POST['update_zone']) && ($active_user->admin || $active_user->access_to($zone) == 'administrator')) {
 		$zone->kind = $_POST['kind'];
+		$zone->catalog = $_POST['catalog'];
 		$zone->account = $_POST['classification'];
 		$zone->update();
 		$primary_ns = $_POST['primary_ns'];
@@ -336,6 +338,7 @@ if(!isset($content)) {
 	$content->set('cryptokeys', $cryptokeys);
 	$content->set('allusers', $allusers);
 	$content->set('replication_types', $replication_types);
+	$content->set('catalog_zones', $catalog_zones);
 	$content->set('local_zone', $local_zone);
 	$content->set('local_ipv4_ranges', $config['dns']['local_ipv4_ranges']);
 	$content->set('local_ipv6_ranges', $config['dns']['local_ipv6_ranges']);

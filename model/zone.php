@@ -48,6 +48,10 @@ class Zone extends Record {
 	*/
 	private $api_rectify = null;
 	/**
+ 	* Consumer catalog zone for this zone
+ 	*/
+	private $catalog = null;
+	/**
 	* List of changes to be applied to the zone when doing ->commit_changes()
 	*/
 	private $changes = array();
@@ -92,6 +96,8 @@ class Zone extends Record {
 		case 'api_rectify':
 			$this->api_rectify = $value;
 			break;
+		case 'catalog':
+			$this->catalog = $value;
 		default:
 			parent::__set($field, $value);
 		}
@@ -201,6 +207,7 @@ class Zone extends Record {
 		global $config;
 		$update = new StdClass;
 		$update->kind = $this->kind;
+		$update->catalog = $this->catalog;
 		$update->account = $this->account;
 		if(isset($config['dns']['dnssec']) && $config['dns']['dnssec'] == 1) {
 			$update->dnssec = (bool)$this->dnssec;
@@ -648,6 +655,7 @@ class Zone extends Record {
 		$data = new StdClass;
 		$data->name = $this->name;
 		$data->kind = $this->kind;
+		$data->catalog = $this->catalog;
 		$data->nameservers = array();
 		$data->rrsets = array();
 		foreach($rrsets as $rrset) {

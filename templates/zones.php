@@ -17,6 +17,7 @@
 $active_user = $this->get('active_user');
 $zones = $this->get('zones');
 $replication_types = $this->get('replication_types');
+$catalog_zones = $this->get('catalog_zones');
 $soa_templates = $this->get('soa_templates');
 $ns_templates = $this->get('ns_templates');
 $dnssec_enabled = $this->get('dnssec_enabled');
@@ -196,6 +197,17 @@ foreach($zones as $zone) {
 						<option value=""></option>
 						<?php foreach($replication_types as $type) { ?>
 						<option value="<?php out($type->name)?>"<?php if($type->default) out(' selected')?>><?php out($type->name)?></option>
+						<?php } ?>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="catalog" class="col-sm-2 control-label">Catalog zone</label>
+				<div class="col-sm-10">
+					<select name="catalog" class="form-control">
+						<option value=""></option>
+						<?php foreach($catalog_zones as $zone) { ?>
+						<option value="<?php out($zone->name)?>"><?php out($zone->name)?></option>
 						<?php } ?>
 					</select>
 				</div>

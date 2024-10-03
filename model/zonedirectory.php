@@ -39,13 +39,14 @@ class ZoneDirectory extends DBDirectory {
 	* @param Zone $zone to be added
 	*/
 	public function add_zone(Zone $zone) {
-		$stmt = $this->database->prepare('INSERT INTO zone (pdns_id, name, serial, kind, account, dnssec) VALUES (?, ?, ?, ?, ?, ?)');
+		$stmt = $this->database->prepare('INSERT INTO zone (pdns_id, name, serial, kind, account, dnssec, catalog) VALUES (?, ?, ?, ?, ?, ?, ?)');
 		$stmt->bindParam(1, $zone->pdns_id, PDO::PARAM_STR);
 		$stmt->bindParam(2, $zone->name, PDO::PARAM_STR);
 		$stmt->bindParam(3, $zone->serial, PDO::PARAM_INT);
 		$stmt->bindParam(4, $zone->kind, PDO::PARAM_STR);
 		$stmt->bindParam(5, $zone->account, PDO::PARAM_STR);
 		$stmt->bindParam(6, $zone->dnssec, PDO::PARAM_INT);
+		$stmt->bindParam(7, $zone->catalog, PDO::PARAM_STR);
 		try {
 			$stmt->execute();
 			$zone->id = $this->database->lastInsertId('zone_id_seq');
@@ -73,6 +74,7 @@ class ZoneDirectory extends DBDirectory {
 		$data = new StdClass;
 		$data->name = $zone->name;
 		$data->kind = $zone->kind;
+		$data->catalog = $zone->catalog;
 		$data->nameservers = $zone->nameservers;
 		$data->rrsets = array();
 		foreach($zone->list_resource_record_sets() as $rrset) {
@@ -149,6 +151,7 @@ class ZoneDirectory extends DBDirectory {
 					$zone->pdns_id = $pdns_zone->id;
 					$zone->name = $pdns_zone->name;
 					$zone->kind = $pdns_zone->kind;
+					$zone->catalog = $pdns_zone->catalog;
 					$zone->serial = $pdns_zone->serial;
 					$zone->account = $pdns_zone->account;
 					$zone->dnssec = $pdns_zone->dnssec;
@@ -156,7 +159,7 @@ class ZoneDirectory extends DBDirectory {
 					$zones_by_pdns_id[$zone->pdns_id] = $zone;
 					$current_zones[$zone->pdns_id] = true;
 				} else {
-					$fields = array('serial' => PDO::PARAM_INT, 'kind' => PDO::PARAM_STR, 'account' => PDO::PARAM_STR, 'dnssec' => PDO::PARAM_INT);
+					$fields = array('serial' => PDO::PARAM_INT, 'kind' => PDO::PARAM_STR, 'account' => PDO::PARAM_STR, 'dnssec' => PDO::PARAM_INT, 'catalog' => PDO::PARAM_STR);
 					foreach($fields as $field => $type) {
 						if($zones_by_pdns_id[$pdns_zone->id]->{$field} != $pdns_zone->{$field}) {
 							$zones_by_pdns_id[$pdns_zone->id]->{$field} = $pdns_zone->{$field};
@@ -188,6 +191,22 @@ class ZoneDirectory extends DBDirectory {
 			}
 		}
 		$this->database->query('COMMIT WORK');
+		return $zones_by_pdns_id;
+	}
+
+	/**
+	* Fetch the list of zones matching the specific type
+	* @param string $type of the zones to list
+	* @return array of Zone objects indexed by pdns_id
+	*/
+	public function list_zones_by_kind($type) {
+		$stmt = $this->database->prepare('SELECT * FROM zone WHERE kind = ?');
+		$stmt->bindParam(1, $type, PDO::PARAM_STR);
+		$stmt->execute();
+		$zones_by_pdns_id = array();
+		while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+			$zones_by_pdns_id[$row['pdns_id']] = new Zone($row['id'], $row);
+		}
 		return $zones_by_pdns_id;
 	}
 
