@@ -385,8 +385,8 @@ global $output_formatter;
 					<?php if($active_user->admin) { ?>
 					<select id="catalog" name="catalog" class="form-control">
 						<option value=""></option>
-						<?php foreach($catalog_zones as $zone) { ?>
-						<option value="<?php out($zone->name)?>"><?php out($zone->name)?></option>
+						<?php foreach($catalog_zones as $catalog) { ?>
+						<option value="<?php out($catalog->name)?>"<?php if($zone->catalog == $catalog->name) out(' selected')?>><?php out($catalog->name)?></option>
 						<?php } ?>
 					</select>
 					<?php } else { ?>

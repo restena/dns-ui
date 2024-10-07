@@ -97,7 +97,8 @@ class Zone extends Record {
 			$this->api_rectify = $value;
 			break;
 		case 'catalog':
-			$this->catalog = $value;
+			if($value != '') $this->catalog = $value;
+			break;
 		default:
 			parent::__set($field, $value);
 		}
