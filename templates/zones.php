@@ -183,65 +183,68 @@ foreach($zones as $zone) {
 	<div role="tabpanel" class="tab-pane" id="create">
 		<h2 class="sr-only">Create zone</h2>
 		<form method="post" action="<?php outurl('/zones')?>" class="form-horizontal zoneadd">
-			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
-			<div class="form-group">
-				<label for="name" class="col-sm-2 control-label">Zone name</label>
-				<div class="col-sm-10">
-					<input type="text" class="form-control" id="name" name="name" required pattern="\S*[^\r\n\t\f .]\.?" maxlength="255">
-				</div>
-			</div>
-			<div class="form-group">
-				<label for="kind" class="col-sm-2 control-label">Replication type</label>
-				<div class="col-sm-10">
-					<select name="kind" class="form-control" required>
-						<option value=""></option>
-						<?php foreach($replication_types as $type) { ?>
-						<option value="<?php out($type->name)?>"<?php if($type->default) out(' selected')?>><?php out($type->name)?></option>
-						<?php } ?>
-					</select>
-				</div>
-			</div>
-			<div class="form-group">
-				<label for="catalog" class="col-sm-2 control-label">Catalog zone</label>
-				<div class="col-sm-10">
-					<select name="catalog" class="form-control">
-						<option value=""></option>
-						<?php foreach($catalog_zones as $zone) { ?>
-						<option value="<?php out($zone->name)?>"><?php out($zone->name)?></option>
-						<?php } ?>
-					</select>
-				</div>
-			</div>
-			<div class="form-group">
-				<label for="classification" class="col-sm-2 control-label">Classification</label>
-				<div class="col-sm-10">
-					<?php if($force_account_whitelist) { ?>
-					<select class="form-control" id="classification" name="classification" required>
-						<?php foreach($account_whitelist as $account) { ?>
-						<option value="<?php out($account)?>"><?php out($account)?></option>
-						<?php } ?>
-					</select>
-					<?php } else { ?>
-					<input type="text" class="form-control" id="classification" name="classification" required list="account_list" maxlength="40">
-					<datalist id="account_list">
-						<?php foreach($accounts as $account) { ?>
-						<option value="<?php out($account)?>"><?php out($account)?></option>
-						<?php } ?>
-					</datalist>
-					<?php } ?>
-				</div>
-			</div>
-			<?php if($dnssec_enabled && $dnssec_edit) { ?>
-			<div class="form-group">
-				<label for="dnssec" class="col-sm-2 control-label">DNSSEC</label>
-				<div class="col-sm-10">
-					<div class="checkbox">
-						<label><input type="checkbox" id="dnssec" name="dnssec" value="1"> Enabled</label>
+			<fieldset id="settings-fieldset" name="settings-fieldset">
+				<legend>Zone settings</legend>
+				<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
+				<div class="form-group">
+					<label for="name" class="col-sm-2 control-label">Zone name</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="name" name="name" required pattern="\S*[^\r\n\t\f .]\.?" maxlength="255">
 					</div>
 				</div>
-			</div>
-			<?php } ?>
-			<fieldset>
+				<div class="form-group">
+					<label for="kind" class="col-sm-2 control-label">Replication type</label>
+					<div class="col-sm-10">
+						<select id="kind" name="kind" class="form-control" required>
+							<option value=""></option>
+							<?php foreach($replication_types as $type) { ?>
+							<option value="<?php out($type->name)?>"<?php if($type->default) out(' selected')?>><?php out($type->name)?></option>
+							<?php } ?>
+						</select>
+					</div>
+				</div>
+				<div class="form-group" id="catalog-form-group" name="catalog-form-group">
+					<label for="catalog" class="col-sm-2 control-label">Catalog zone</label>
+					<div class="col-sm-10">
+						<select id="catalog" name="catalog" class="form-control">
+							<option value=""></option>
+							<?php foreach($catalog_zones as $catalog) { ?>
+							<option value="<?php out($catalog->name)?>"><?php out($catalog->name)?></option>
+							<?php } ?>
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="classification" class="col-sm-2 control-label">Classification</label>
+					<div class="col-sm-10">
+						<?php if($force_account_whitelist) { ?>
+						<select class="form-control" id="classification" name="classification" required>
+							<?php foreach($account_whitelist as $account) { ?>
+							<option value="<?php out($account)?>"><?php out($account)?></option>
+							<?php } ?>
+						</select>
+						<?php } else { ?>
+						<input type="text" class="form-control" id="classification" name="classification" required list="account_list" maxlength="40">
+						<datalist id="account_list">
+							<?php foreach($accounts as $account) { ?>
+							<option value="<?php out($account)?>"><?php out($account)?></option>
+							<?php } ?>
+						</datalist>
+						<?php } ?>
+					</div>
+				</div>
+				<?php if($dnssec_enabled && $dnssec_edit) { ?>
+				<div class="form-group" id="dnssec-form-group" name="dnssec-form-group">
+					<label for="dnssec" class="col-sm-2 control-label">DNSSEC</label>
+					<div class="col-sm-10">
+						<div class="checkbox">
+							<label><input type="checkbox" id="dnssec" name="dnssec" value="1"> Enabled</label>
+						</div>
+					</div>
+				</div>
+				<?php } ?>
+			</fieldset>
+			<fieldset id="soa-fieldset" name="soa-fieldset">
 				<legend>SOA</legend>
 				<div class="form-group">
 					<label class="col-sm-2 control-label">SOA templates</label>
@@ -295,7 +298,7 @@ foreach($zones as $zone) {
 					</div>
 				</div>
 			</fieldset>
-			<fieldset>
+			<fieldset id="nameservers-fieldset" name="nameservers-fieldset">
 				<legend>Nameservers</legend>
 				<div class="form-group">
 					<label class="col-sm-2 control-label">Nameserver templates</label>

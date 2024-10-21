@@ -903,6 +903,17 @@ $(function() {
 			$('a[href=#create]').tab('show');
 		}
 	});
+	
+	// Disable superfluous fields for Producer (catalog) zones
+	$('form.zoneadd, form.zoneeditsoa').each(function() {
+		var form = $(this);
+		$('select#kind', form).on('change', function() {
+			var hide_fields = (this.value == 'Producer')
+			$('div#catalog-form-group, div#dnssec-form-group, fieldset#soa-fieldset, fieldset#nameservers-fieldset', form).each(function() {
+				$(this).prop('hidden', hide_fields);
+			});
+		});
+	});
 
 	$('#changelog-expand-all').on('click', function() {
 		$('table.changelog tbody tr[data-changeset]').each(function() {
