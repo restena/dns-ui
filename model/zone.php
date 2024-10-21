@@ -48,10 +48,6 @@ class Zone extends Record {
 	*/
 	private $api_rectify = null;
 	/**
- 	* Consumer catalog zone for this zone
- 	*/
-	private $catalog = null;
-	/**
 	* List of changes to be applied to the zone when doing ->commit_changes()
 	*/
 	private $changes = array();
@@ -95,9 +91,6 @@ class Zone extends Record {
 			break;
 		case 'api_rectify':
 			$this->api_rectify = $value;
-			break;
-		case 'catalog':
-			if($value != '') $this->catalog = $value;
 			break;
 		default:
 			parent::__set($field, $value);
