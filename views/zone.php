@@ -94,6 +94,7 @@ $accounts = $zone_dir->list_accounts();
 $allusers = $user_dir->list_users();
 $replication_types = $replication_type_dir->list_replication_types();
 $catalog_zones = $zone_dir->list_zones_by_kind('Producer');
+$member_zones = $zone_dir->list_zones_by_catalog($zone->name);
 $force_change_review = isset($config['web']['force_change_review']) ? intval($config['web']['force_change_review']) : 0;
 $force_change_comment = isset($config['web']['force_change_comment']) ? intval($config['web']['force_change_comment']) : 0;
 $account_whitelist = !empty($config['dns']['classification_whitelist']) ? explode(',', $config['dns']['classification_whitelist']) : [];
@@ -291,6 +292,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 		if(count($json->actions) > 0) {
 			$json->comment = $_POST['soa_change_comment'];
 			$zone->process_bulk_json_rrset_update(json_encode($json));
+		}
+		// When kind is changed away from Producer, update all member zones
+		// to no longer be part of the catalog
+		if($previous_kind === 'Producer' && $previous_kind != $zone->kind) {
+			foreach($member_zones as $member) {
+				$member->catalog = '';
+				$member->update();
+			}
 		}
 		redirect();
 	} elseif(isset($_POST['enable_dnssec']) && $active_user->admin && $dnssec_enabled && $dnssec_edit) {

@@ -211,6 +211,22 @@ class ZoneDirectory extends DBDirectory {
 	}
 
 	/**
+	* Fetch the list of member zones having the specified catalog zone as producer
+	* @param string $catalog zone to list members
+	* @return array of member Zone objects indexed by pdns_id
+	*/
+	public function list_zones_by_catalog($catalog) {
+		$stmt = $this->database->prepare('SELECT * FROM zone WHERE catalog = ?');
+		$stmt->bindParam(1, $catalog, PDO::PARAM_STR);
+		$stmt->execute();
+		$zones_by_pdns_id = array();
+		while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+			$zones_by_pdns_id[$row['pdns_id']] = new Zone($row['id'], $row);
+		}
+		return $zones_by_pdns_id;
+	}
+
+	/**
 	* Fetch the zone matching the specific name.
 	* @param string $name of zone to fetch
 	* @return Zone object
